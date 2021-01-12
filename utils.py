@@ -25,21 +25,21 @@ def prepare_img(img_path, target_shape, device, mean=[123.675, 116.28, 103.53], 
 
 	transform = transforms.Compose([
 		transforms.ToTensor(),
-		transforms.Normalize(mean=IMAGE_MEAN, std=IMAGE_STD)
+		transforms.Normalize(mean=mean, std=std)
 		])
 	img = transform(img).to(device).unsqueeze(0)
 
 	return img
 
 
-def save_image(optimizing_img, cnt, config):
+def save_image(optimizing_img, cnt, config, mean=[123.675, 116.28, 103.53], std=[1, 1, 1]):
 
 	path = config['output_dir'] + "img" + str(cnt) + ".jpg" 
 	out_img = optimizing_img.squeeze(axis=0).to('cpu').detach().numpy()
 	out_img = np.moveaxis(out_img, 0, 2) # move chanel to 3rd cord
 
 	dump_img = np.copy(out_img)
-	dump_img += np.array(IMAGE_MEAN).reshape((1,1,3))
+	dump_img += np.array(mean).reshape((1,1,3))
 	dump_img = np.clip(dump_img, 0, 255).astype('uint8')
 	cv.imwrite(path, dump_img[:, :, ::-1]) # reverses last dimension, BGR -> RGB
 
